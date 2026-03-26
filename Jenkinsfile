@@ -1,7 +1,7 @@
 pipeline {
     agent {
         docker {
-            image 'image 'cypress/browsers:node20.10.0-chrome120'
+            image 'cypress/browsers:node20.10.0-chrome120'
             args '-v /var/run/docker.sock:/var/run/docker.sock --network hafalat-devops_hafalat-network'
         }
     }
