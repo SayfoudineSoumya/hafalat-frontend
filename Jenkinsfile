@@ -1,7 +1,7 @@
 pipeline {
     agent {
         docker {
-            image 'node:20-alpine'
+            image 'cypress/browsers:node18.12.0-chrome107'
             args '-v /var/run/docker.sock:/var/run/docker.sock --network hafalat-devops_hafalat-network'
         }
     }
@@ -9,39 +9,33 @@ pipeline {
     environment {
         IMAGE_NAME = 'soumayasayfoudine/hafalat-frontend'
         VERSION = "1.0.${BUILD_NUMBER}"
-        SCANNER_HOME = tool 'SonarQubeScanner'
     }
 
     stages {
-
+        // stage('Checkout') {
+        //     steps {
+        //         checkout scm
+        //     }
+        // }
         stage('Install Dependencies') {
             steps {
                 script {
-                    sh 'npm ci'
+                    sh 'npm install'
                 }
             }
         }
 
-        stage('Lint') {
+        stage('Run Tests') {
             steps {
                 script {
-                    sh 'npm run lint || echo "Linting completed with warnings"'
+                    sh 'npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage'
                 }
             }
         }
 
-        stage('Test') {
+        stage('Build Angular App') {
             steps {
-                script {
-                    echo 'Skipping tests - requires ChromeHeadless setup'
-                    // sh 'npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage'
-                }
-            }
-        }
-
-        stage('Build') {
-            steps {
-                sh 'npm run build'
+                sh 'npm run build -- --configuration production'
             }
         }
 
