@@ -41,7 +41,7 @@ pipeline {
         }
 
         stage('SonarQube Analysis') {
-            agent any
+            agent { docker { image 'soumayasayfoudine/hafalat-frontend:latest' } } 
             steps {
                 withSonarQubeEnv('SonarQube') {
                     sh '''
@@ -57,7 +57,6 @@ pipeline {
                 }
             }
         }
-
         stage('Docker Build') {
             agent any
             steps {
