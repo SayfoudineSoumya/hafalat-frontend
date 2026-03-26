@@ -46,6 +46,7 @@ pipeline {
         }
 
         stage('SonarQube Analysis') {
+            agent any
             steps {
                 withSonarQubeEnv('SonarQube') {
                     sh '''
