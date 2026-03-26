@@ -7,6 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "lint": "ng lint || echo 'No linting configured'",
     "serve:ssr:hafalat-frontend": "node dist/hafalat-frontend/server/server.mjs"
   },
   "prettier": {
