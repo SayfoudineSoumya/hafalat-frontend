@@ -1,0 +1,26 @@
+# Dockerfile.ci
+FROM node:20-bullseye-slim
+
+# Install Java (required by SonarQube Scanner) and Chromium for Angular tests
+RUN apt-get update && apt-get install -y \
+    openjdk-17-jdk \
+    wget \
+    unzip \
+    git \
+    curl \
+    chromium \
+    chromium-driver && \
+    rm -rf /var/lib/apt/lists/*
+
+# Set Chrome path for Angular tests
+ENV CHROME_BIN=/usr/bin/chromium
+ENV CHROMIUM_FLAGS="--no-sandbox --disable-dev-shm-usage"
+
+# Install SonarScanner via npm
+RUN npm install -g sonar-scanner
+
+# Set SonarScanner environment
+ENV SONAR_SCANNER_OPTS="-Xmx512m"
+
+# Workdir
+WORKDIR /workspace
