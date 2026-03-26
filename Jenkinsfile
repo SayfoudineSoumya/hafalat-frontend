@@ -132,9 +132,7 @@ pipeline {
             echo "❌ Frontend pipeline FAILED"
         }
         always {
-            node {
-                cleanWs()
-            }
+            cleanWs()
         }
     }
 }
