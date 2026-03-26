@@ -45,7 +45,7 @@ pipeline {
             steps {
                 withSonarQubeEnv('SonarQube') {
                     sh '''
-                        ${SCANNER_HOME}/bin/sonar-scanner \
+                        sonar-scanner \
                         -Dsonar.projectKey=hafalat-frontend \
                         -Dsonar.sources=src \
                         -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/*.spec.ts \
