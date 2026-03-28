@@ -16,7 +16,7 @@ jobs:
 
     env:
       IMAGE_NAME: hafalat-frontend
-      DOCKER_NETWORK: hafalat-devops_hafalat-network
+      DOCKER_NETWORK: hafalat-network
 
     steps:
       - name: Checkout Repository
