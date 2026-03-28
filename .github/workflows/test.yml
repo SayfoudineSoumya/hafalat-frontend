@@ -1,0 +1,64 @@
+name: Run Tests
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - feature/**
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18, 20]
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Unit Tests
+        run: npm test -- --watch=false --browsers=ChromeHeadless --code-coverage
+
+      - name: Generate Coverage Report
+        run: |
+          echo "## Test Coverage Report - Node ${{ matrix.node-version }}" >> $GITHUB_STEP_SUMMARY
+          if [ -f coverage/lcov.info ]; then
+            echo "Coverage report generated successfully" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Upload Coverage to Codecov
+        uses: codecov/codecov-action@v3
+        if: matrix.node-version == 20
+        with:
+          files: ./coverage/lcov.info
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+
+      - name: Archive Test Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-node-${{ matrix.node-version }}
+          path: |
+            coverage/
+            karma-results/
+
+      - name: Test Summary
+        if: always()
+        run: |
+          echo "### Test Results for Node ${{ matrix.node-version }}" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Tests completed" >> $GITHUB_STEP_SUMMARY

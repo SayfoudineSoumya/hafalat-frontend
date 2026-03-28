@@ -1,0 +1,60 @@
+name: PR Validation
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Lint Code
+        run: npm run lint
+
+      - name: Run Tests
+        run: npm test -- --watch=false --browsers=ChromeHeadless --code-coverage
+
+      - name: Build Application
+        run: npm run build -- --configuration production
+
+      - name: Check Build Size
+        run: |
+          echo "## Build Size Report" >> $GITHUB_STEP_SUMMARY
+          du -sh dist/* >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload Coverage Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: coverage/
+
+      - name: Comment PR with Results
+        uses: actions/github-script@v6
+        if: always()
+        with:
+          script: |
+            const fs = require('fs');
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '✅ PR validation completed! Check the Actions tab for detailed results.'
+            })
